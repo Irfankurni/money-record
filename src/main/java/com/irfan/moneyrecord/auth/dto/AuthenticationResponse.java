@@ -1,6 +1,5 @@
 package com.irfan.moneyrecord.auth.dto;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -12,6 +11,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class AuthenticationResponse {
 
-  private String accessToken;
-  private String refreshToken;
+    private String accessToken;
+    private String refreshToken;
 }

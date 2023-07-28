@@ -4,6 +4,7 @@ import com.irfan.moneyrecord.auth.dto.AuthenticationRequest;
 import com.irfan.moneyrecord.auth.dto.AuthenticationResponse;
 import com.irfan.moneyrecord.auth.dto.RegisterRequest;
 import com.irfan.moneyrecord.auth.service.AuthenticationService;
+import com.irfan.moneyrecord.exception.InvalidLoginException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -32,8 +33,12 @@ public class AuthenticationController {
     @PostMapping("/authenticate")
     public ResponseEntity<AuthenticationResponse> authenticate(
             @RequestBody AuthenticationRequest request
-    ) {
-        return ResponseEntity.ok(service.authenticate(request));
+    ) throws InvalidLoginException {
+        try {
+            return ResponseEntity.ok(service.authenticate(request));
+        } catch (Exception e) {
+            throw new InvalidLoginException("Invalid Username/Passwords");
+        }
     }
 
     @PostMapping("/refresh-token")

@@ -5,6 +5,7 @@ import com.irfan.moneyrecord.auth.dto.AuthenticationRequest;
 import com.irfan.moneyrecord.auth.dto.AuthenticationResponse;
 import com.irfan.moneyrecord.auth.dto.RegisterRequest;
 import com.irfan.moneyrecord.config.JwtService;
+import com.irfan.moneyrecord.exception.InvalidLoginException;
 import com.irfan.moneyrecord.token.model.Token;
 import com.irfan.moneyrecord.token.model.TokenType;
 import com.irfan.moneyrecord.token.repository.TokenRepository;
@@ -48,13 +49,18 @@ public class AuthenticationService {
                 .build();
     }
 
-    public AuthenticationResponse authenticate(AuthenticationRequest request) {
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        request.getEmail(),
-                        request.getPassword()
-                )
-        );
+    public AuthenticationResponse authenticate(AuthenticationRequest request) throws Exception {
+        try {
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            request.getEmail(),
+                            request.getPassword()
+                    )
+            );
+        } catch (Exception e) {
+            throw new InvalidLoginException("Email/Password Wrong");
+        }
+
         var user = repository.findByEmail(request.getEmail())
                 .orElseThrow();
         var jwtToken = jwtService.generateToken(user);

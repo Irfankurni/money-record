@@ -1,5 +1,6 @@
 package com.irfan.moneyrecord.config;
 
+import com.irfan.moneyrecord.constant.CommonConstant;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -30,7 +31,7 @@ public class SecurityConfiguration {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests((authorizeHttpRequests) ->
                         authorizeHttpRequests
-                                .requestMatchers("/api/v1/auth/**")
+                                .requestMatchers(CommonConstant.WHITELIST)
                                 .permitAll()
                                 .anyRequest()
                                 .authenticated()

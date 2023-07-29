@@ -1,4 +1,4 @@
-package com.irfan.moneyrecord.history;
+package com.irfan.moneyrecord.history.dao;
 
 import com.irfan.moneyrecord.config.BaseEntityManager;
 import com.irfan.moneyrecord.history.dto.HomeRes;

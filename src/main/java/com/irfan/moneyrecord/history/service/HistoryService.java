@@ -2,7 +2,7 @@ package com.irfan.moneyrecord.history.service;
 
 import com.irfan.moneyrecord.constant.CommonConstant;
 import com.irfan.moneyrecord.dto.MessageResponse;
-import com.irfan.moneyrecord.history.HistoryDao;
+import com.irfan.moneyrecord.history.dao.HistoryDao;
 import com.irfan.moneyrecord.history.dto.*;
 import com.irfan.moneyrecord.history.model.History;
 import com.irfan.moneyrecord.history.model.HistoryDetails;
@@ -10,7 +10,6 @@ import com.irfan.moneyrecord.history.repository.HistoryDetailsRepository;
 import com.irfan.moneyrecord.history.repository.HistoryRepository;
 import com.irfan.moneyrecord.user.model.User;
 import com.irfan.moneyrecord.user.principal.PrincipalService;
-import com.irfan.moneyrecord.user.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

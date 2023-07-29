@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.irfan.moneyrecord.auth.dto.AuthenticationRequest;
 import com.irfan.moneyrecord.auth.dto.AuthenticationResponse;
 import com.irfan.moneyrecord.auth.dto.RegisterRequest;
+import com.irfan.moneyrecord.auth.dto.UserData;
 import com.irfan.moneyrecord.config.JwtService;
 import com.irfan.moneyrecord.exception.InvalidLoginException;
 import com.irfan.moneyrecord.token.model.Token;
@@ -68,6 +69,11 @@ public class AuthenticationService {
         revokeAllUserTokens(user);
         saveUserToken(user, jwtToken);
         return AuthenticationResponse.builder()
+                .data(UserData.builder()
+                        .id(user.getId())
+                        .firstName(user.getFirstname())
+                        .lastName(user.getLastname())
+                        .build())
                 .accessToken(jwtToken)
                 .refreshToken(refreshToken)
                 .build();
@@ -115,6 +121,11 @@ public class AuthenticationService {
                 revokeAllUserTokens(user);
                 saveUserToken(user, accessToken);
                 var authResponse = AuthenticationResponse.builder()
+                        .data(UserData.builder()
+                                .id(user.getId())
+                                .firstName(user.getFirstname())
+                                .lastName(user.getLastname())
+                                .build())
                         .accessToken(accessToken)
                         .refreshToken(refreshToken)
                         .build();

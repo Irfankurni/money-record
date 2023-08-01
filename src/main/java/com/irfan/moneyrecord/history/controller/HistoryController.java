@@ -1,6 +1,5 @@
 package com.irfan.moneyrecord.history.controller;
 
-import com.irfan.moneyrecord.constant.CommonConstant;
 import com.irfan.moneyrecord.dto.MessageResponse;
 import com.irfan.moneyrecord.history.dto.HistoryRequest;
 import com.irfan.moneyrecord.history.repository.HistoryRepository;
@@ -15,44 +14,41 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class HistoryController {
 
-    private final HistoryService historyService;
+    private final HistoryService historyServiceImpl;
     private final HistoryRepository repository;
 
     @PostMapping
     public ResponseEntity<MessageResponse> add(@RequestBody HistoryRequest request) throws Exception {
         try {
-            return ResponseEntity.ok(historyService.add(request));
+            return ResponseEntity.ok(historyServiceImpl.add(request));
         } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(new MessageResponse(CommonConstant.FAILED));
+            throw new Exception(e.getMessage());
         }
     }
 
     @DeleteMapping("{id}")
     public ResponseEntity<MessageResponse> delete(@PathVariable String id) throws Exception {
         try {
-            return ResponseEntity.ok(historyService.delete(id));
+            return ResponseEntity.ok(historyServiceImpl.delete(id));
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(new MessageResponse(CommonConstant.FAILED));
+            throw new Exception(e.getMessage());
         }
     }
 
     @GetMapping("/analysis")
-    public ResponseEntity<?> getPerWeek(String userId) throws Exception {
-        return ResponseEntity.ok(historyService.getPerWeek(userId));
+    public ResponseEntity<?> getPerWeek() throws Exception {
+        return ResponseEntity.ok(historyServiceImpl.getPerWeek());
     }
 
     @GetMapping()
     public ResponseEntity<?> findByUser() throws Exception {
-        var result = historyService.getByUser();
+        var result = historyServiceImpl.getByUser();
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
     @GetMapping("{id}")
     public ResponseEntity<?> getDetail(@PathVariable String id) throws Exception {
-        var result = historyService.getDetails(id);
+        var result = historyServiceImpl.getDetails(id);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 }

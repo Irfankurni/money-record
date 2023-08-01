@@ -7,13 +7,16 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 @Repository
 public class HistoryDao extends BaseEntityManager {
 
+    @SuppressWarnings("unchecked")
     public HomeRes getPerWeek(String userId) {
-        String sql = "SELECT date, sum(total) FROM history  \n" +
+        String sql = "SELECT date, trim(to_char(date, 'Day')) AS \"day\"," +
+                "sum(total) FROM history  \n" +
                 "WHERE " +
                 "     user_id = :userId " +
                 "     AND date >= :dateEnd " +
@@ -26,17 +29,20 @@ public class HistoryDao extends BaseEntityManager {
                 .setParameter("dateEnd", LocalDate.now().minusDays(6));
         List<Object[]> list = query.setMaxResults(7).getResultList();
         HomeRes homeRes = new HomeRes();
-        List<Double> week = new ArrayList<>();
+        List<LinkedHashMap<String, Object>> weeks = new ArrayList<>();
         for (Object[] date : list) {
             if (LocalDate.parse(date[0].toString()).isEqual(LocalDate.now())) {
-                homeRes.setToday((Number) date[1]);
+                homeRes.setToday((Number) date[2]);
             }
             if (LocalDate.parse(date[0].toString()).isEqual(LocalDate.now().minusDays(1))) {
-                homeRes.setYesterday((Number) date[1]);
+                homeRes.setYesterday((Number) date[2]);
             }
-            week.add((Double) date[1]);
+            LinkedHashMap<String, Object> week = new LinkedHashMap<>();
+            week.put("day", (String) date[1]);
+            week.put("total", (Double) date[2]);
+            weeks.add(week);
         }
-        homeRes.setWeek(week);
+        homeRes.setWeek(weeks);
 
         return homeRes;
     }
@@ -46,7 +52,7 @@ public class HistoryDao extends BaseEntityManager {
                 "WHERE\n" +
                 "\tuser_id = :userId\n" +
                 "\tAND EXTRACT(MONTH FROM date) = :month\n" +
-                " AND lower(type) = lower('Pemasukan')";
+                " AND lower(type) = lower('Pemasukkan')";
 
         Query query = em.createNativeQuery(sql)
                 .setParameter("userId", userId)

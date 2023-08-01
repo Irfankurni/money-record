@@ -10,6 +10,7 @@ import com.irfan.moneyrecord.exception.InvalidLoginException;
 import com.irfan.moneyrecord.token.model.Token;
 import com.irfan.moneyrecord.token.model.TokenType;
 import com.irfan.moneyrecord.token.repository.TokenRepository;
+import com.irfan.moneyrecord.user.model.Role;
 import com.irfan.moneyrecord.user.model.User;
 import com.irfan.moneyrecord.user.repository.UserRepository;
 import jakarta.servlet.http.HttpServletRequest;
@@ -38,7 +39,7 @@ public class AuthenticationService {
                 .lastname(request.getLastname())
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
-                .role(request.getRole())
+                .role(Role.USER)
                 .build();
         var savedUser = repository.save(user);
         var jwtToken = jwtService.generateToken(user);

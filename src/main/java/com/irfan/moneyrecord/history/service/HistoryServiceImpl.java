@@ -64,8 +64,8 @@ public class HistoryServiceImpl implements HistoryService {
     @Override
     @Transactional(rollbackOn = Exception.class)
     public MessageResponse delete(String id) throws Exception {
-        var details = detailsRepository.deleteByHistoryId(id);
-        if (details) {
+        int details = detailsRepository.deleteByHistoryId(id);
+        if (details > 0) {
             repository.deleteById(id);
         }
         return MessageResponse.builder()
@@ -85,10 +85,10 @@ public class HistoryServiceImpl implements HistoryService {
     }
 
     @Override
-    public List<HistoryRes> getByUser() {
+    public List<HistoryRes> getByUser(String type) {
         var user = (User) principalService.getAuthPrincipal();
 
-        List<History> histories = repository.findByUser(user);
+        List<History> histories = repository.findByUserAndType(user, type);
 
         List<HistoryRes> result = new ArrayList<>();
         for (History res: histories) {
@@ -110,7 +110,7 @@ public class HistoryServiceImpl implements HistoryService {
 
     @Override
     public HistoryRes getDetails(String id) {
-        var history = repository.findById(id).orElse(null);
+        var history = repository.findById(id).orElseThrow();
         var details = detailsRepository.findAllByHistory(history);
         return HistoryRes.builder()
                 .id(history.getId())

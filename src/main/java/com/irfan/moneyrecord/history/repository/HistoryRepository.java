@@ -10,5 +10,5 @@ import java.util.List;
 @Repository
 public interface HistoryRepository extends JpaRepository<History, String> {
 
-    List<History> findByUser(User user);
+    List<History> findByUserAndType(User user, String type);
 }

@@ -11,7 +11,7 @@ public interface HistoryService {
 
     MessageResponse add(HistoryRequest request) throws Exception;
     MessageResponse delete(String id) throws Exception;
-    List<HistoryRes> getByUser();
+    List<HistoryRes> getByUser(String type);
     HomeRes getPerWeek() throws Exception;
     HistoryRes getDetails(String id);
 }

@@ -12,6 +12,5 @@ import lombok.NoArgsConstructor;
 public class UserData {
 
     private String id;
-    private String firstName;
-    private String lastName;
+    private String fullName;
 }

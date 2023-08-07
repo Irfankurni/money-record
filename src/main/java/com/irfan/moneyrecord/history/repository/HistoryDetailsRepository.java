@@ -10,7 +10,7 @@ import java.util.List;
 @Repository
 public interface HistoryDetailsRepository extends JpaRepository<HistoryDetails, String> {
 
-    boolean deleteByHistoryId(String historyId);
+    int deleteByHistoryId(String historyId);
 
     List<HistoryDetails> findAllByHistory(History history);
 }

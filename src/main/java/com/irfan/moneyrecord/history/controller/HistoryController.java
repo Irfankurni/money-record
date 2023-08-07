@@ -2,7 +2,6 @@ package com.irfan.moneyrecord.history.controller;
 
 import com.irfan.moneyrecord.dto.MessageResponse;
 import com.irfan.moneyrecord.history.dto.HistoryRequest;
-import com.irfan.moneyrecord.history.repository.HistoryRepository;
 import com.irfan.moneyrecord.history.service.HistoryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -15,7 +14,6 @@ import org.springframework.web.bind.annotation.*;
 public class HistoryController {
 
     private final HistoryService historyServiceImpl;
-    private final HistoryRepository repository;
 
     @PostMapping
     public ResponseEntity<MessageResponse> add(@RequestBody HistoryRequest request) throws Exception {
@@ -41,8 +39,8 @@ public class HistoryController {
     }
 
     @GetMapping()
-    public ResponseEntity<?> findByUser() throws Exception {
-        var result = historyServiceImpl.getByUser();
+    public ResponseEntity<?> findByUser(@RequestParam String type) throws Exception {
+        var result = historyServiceImpl.getByUser(type);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 

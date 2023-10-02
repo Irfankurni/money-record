@@ -37,8 +37,7 @@ public class TokenRepositoryTest {
     @Test
     public void findValidToken() {
         User user = User.builder()
-                .firstname("john")
-                .lastname("doe")
+                .fullName("john")
                 .email("john@mail.com")
                 .password("123456")
                 .role(Role.USER)
@@ -65,8 +64,7 @@ public class TokenRepositoryTest {
     @Test
     public void findInvalidToken() {
         User user = User.builder()
-                .firstname("john")
-                .lastname("doe")
+                .fullName("john")
                 .email("john@mail.com")
                 .password("123456")
                 .role(Role.USER)
@@ -93,8 +91,7 @@ public class TokenRepositoryTest {
     @Test
     public void findByToken() {
         User user = User.builder()
-                .firstname("john")
-                .lastname("doe")
+                .fullName("john")
                 .email("john@mail.com")
                 .password("123456")
                 .role(Role.USER)

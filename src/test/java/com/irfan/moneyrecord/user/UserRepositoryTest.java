@@ -25,8 +25,7 @@ public class UserRepositoryTest {
     @Test
     public void findUserByEmail() {
         User user = User.builder()
-                .firstname("john")
-                .lastname("doe")
+                .fullName("john doe")
                 .email("john@mail.com")
                 .password("123456")
                 .role(Role.USER)

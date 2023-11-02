@@ -14,9 +14,6 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import static org.assertj.core.api.Assertions.assertThat;
 
 @ExtendWith(SpringExtension.class)
@@ -29,14 +26,13 @@ public class TokenRepositoryTest {
     @Autowired
     private TokenRepository tokenRepository;
 
+    private User user;
+
+    private Token token;
+
     @BeforeEach
     public void setUp() {
-
-    }
-
-    @Test
-    public void findValidToken() {
-        User user = User.builder()
+        user = User.builder()
                 .fullName("john")
                 .email("john@mail.com")
                 .password("123456")
@@ -44,18 +40,19 @@ public class TokenRepositoryTest {
                 .build();
         em.persist(user);
 
-        List<Token> tokens = new ArrayList<>();
-        var token = Token.builder()
+        token = Token.builder()
                 .token("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c")
                 .tokenType(TokenType.BEARER)
                 .expired(false)
                 .revoked(false)
                 .user(user)
                 .build();
-        tokens.add(token);
         em.persist(token);
         em.flush();
+    }
 
+    @Test
+    public void findValidToken() {
         var tokenValid = tokenRepository.findAllValidTokenByUser(user.getId());
         assertThat(1)
                 .isEqualTo(tokenValid.size());
@@ -63,51 +60,18 @@ public class TokenRepositoryTest {
 
     @Test
     public void findInvalidToken() {
-        User user = User.builder()
-                .fullName("john")
-                .email("john@mail.com")
-                .password("123456")
-                .role(Role.USER)
-                .build();
-        em.persist(user);
+        var revokedToken = tokenRepository.findByToken(token.getToken()).orElseThrow(() -> new NullPointerException("Data Null"));
+        revokedToken.setExpired(true);
+        revokedToken.setRevoked(true);
+        tokenRepository.save(revokedToken);
 
-        List<Token> tokens = new ArrayList<>();
-        var token = Token.builder()
-                .token("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c")
-                .tokenType(TokenType.BEARER)
-                .expired(true)
-                .revoked(false)
-                .user(user)
-                .build();
-        tokens.add(token);
-        em.persist(token);
-        em.flush();
-
-        var tokenValid = tokenRepository.findAllValidTokenByUser(user.getId());
-        assertThat(1)
-                .isEqualTo(tokenValid.size());
+        var tokenInvalid = tokenRepository.findAllValidTokenByUser(user.getId());
+        assertThat(0)
+                .isEqualTo(tokenInvalid.size());
     }
 
     @Test
     public void findByToken() {
-        User user = User.builder()
-                .fullName("john")
-                .email("john@mail.com")
-                .password("123456")
-                .role(Role.USER)
-                .build();
-        em.persist(user);
-
-        var token = Token.builder()
-                .token("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c")
-                .tokenType(TokenType.BEARER)
-                .expired(true)
-                .revoked(false)
-                .user(user)
-                .build();
-        em.persist(token);
-        em.flush();
-
         var tokenValid = tokenRepository.findByToken(token.getToken()).orElse(new Token());
         assertThat(token.getToken())
                 .isEqualTo(tokenValid.getToken());

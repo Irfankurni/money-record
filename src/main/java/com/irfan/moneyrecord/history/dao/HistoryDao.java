@@ -38,8 +38,8 @@ public class HistoryDao extends BaseEntityManager {
                 homeRes.setYesterday((Number) date[2]);
             }
             LinkedHashMap<String, Object> week = new LinkedHashMap<>();
-            week.put("day", (String) date[1]);
-            week.put("total", (Double) date[2]);
+            week.put("day", date[1]);
+            week.put("total", date[2]);
             weeks.add(week);
         }
         homeRes.setWeek(weeks);
@@ -48,7 +48,7 @@ public class HistoryDao extends BaseEntityManager {
     }
 
     public Double getIncomePerMonth(String userId) {
-        String sql = "SELECT sum(total) FROM history \n" +
+        String sql = "SELECT cast(sum(total) as double precision) FROM history \n" +
                 "WHERE\n" +
                 "\tuser_id = :userId\n" +
                 "\tAND EXTRACT(MONTH FROM date) = :month\n" +
@@ -62,7 +62,7 @@ public class HistoryDao extends BaseEntityManager {
     }
 
     public Double getOutcomePerMonth(String userId) {
-        String sql = "SELECT sum(total) FROM history \n" +
+        String sql = "SELECT cast(sum(total) as double precision) FROM history \n" +
                 "WHERE\n" +
                 "\tuser_id = :userId\n" +
                 "\tAND EXTRACT(MONTH FROM date) = :month\n" +

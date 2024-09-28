@@ -5,6 +5,6 @@ ENV SERVER_PORT=8080
 
 WORKDIR /app
 
-COPY target/money-record-0.0.1-SNAPSHOT.jar .
+COPY target/money-record.jar .
 
-CMD ["java", "-jar", "money-record-0.0.1-SNAPSHOT.jar"]
+CMD ["java", "-jar", "money-record.jar"]

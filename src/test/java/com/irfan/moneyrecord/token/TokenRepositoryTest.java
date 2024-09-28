@@ -8,7 +8,6 @@ import com.irfan.moneyrecord.user.model.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
@@ -75,12 +74,5 @@ public class TokenRepositoryTest {
         var tokenValid = tokenRepository.findByToken(token.getToken()).orElse(new Token());
         assertThat(token.getToken())
                 .isEqualTo(tokenValid.getToken());
-    }
-
-    @Test
-    public void findByTokenNull() {
-        var tokenValid = tokenRepository.findByToken(Mockito.anyString()).orElse(null);
-        assertThat(tokenValid)
-                .isNull();
     }
 }

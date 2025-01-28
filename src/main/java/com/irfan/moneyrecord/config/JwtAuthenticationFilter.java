@@ -43,7 +43,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         final String jwt;
         final String userEmail;
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            resError(response);
+            resError(response, "Missing or invalid Authorization header");
             return;
         }
         try {
@@ -55,7 +55,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                         .map(t -> !t.isExpired() && !t.isRevoked())
                         .orElse(false);
                 if (jwtService.isTokenValid(jwt, userDetails) && isTokenValid) {
-
                     UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                             userDetails,
                             null,
@@ -65,24 +64,28 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                             new WebAuthenticationDetailsSource().buildDetails(request)
                     );
                     SecurityContextHolder.getContext().setAuthentication(authToken);
+                } else {
+                    resError(response, "Invalid or expired token");
+                    return;
                 }
             }
         } catch (Exception e) {
-            resError(response);
+            logger.info("Invalid Token: " + e.getMessage());
+            resError(response, "Invalid token");
             return;
         }
         filterChain.doFilter(request, response);
     }
 
-    private void resError(HttpServletResponse response) {
+    private void resError(HttpServletResponse response, String message) {
         try {
             response.setStatus(401);
             response.setContentType("application/json");
             Map<String, Object> map = new HashMap<>();
-            map.put("message", "Invalid token");
+            map.put("message", message);
             response.getWriter().append(objectMapper.writeValueAsString(map));
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.info("resError: " + e.getMessage());
         }
     }
 }

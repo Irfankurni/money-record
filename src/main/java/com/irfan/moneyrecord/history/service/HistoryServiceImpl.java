@@ -2,6 +2,7 @@ package com.irfan.moneyrecord.history.service;
 
 import com.irfan.moneyrecord.constant.CommonConstant;
 import com.irfan.moneyrecord.dto.MessageResponse;
+import com.irfan.moneyrecord.exception.HistoryServiceException;
 import com.irfan.moneyrecord.history.dao.HistoryDao;
 import com.irfan.moneyrecord.history.dto.*;
 import com.irfan.moneyrecord.history.model.History;
@@ -29,7 +30,7 @@ public class HistoryServiceImpl implements HistoryService {
 
     @Override
     @Transactional(rollbackOn = Exception.class)
-    public MessageResponse add(HistoryRequest request) throws Exception {
+    public MessageResponse add(HistoryRequest request) throws HistoryServiceException {
         var user = principalService.getAuthPrincipal();
 
         Double total = request.getTotal();
@@ -63,7 +64,7 @@ public class HistoryServiceImpl implements HistoryService {
 
     @Override
     @Transactional(rollbackOn = Exception.class)
-    public MessageResponse delete(String id) throws Exception {
+    public MessageResponse delete(String id) throws HistoryServiceException {
         int details = detailsRepository.deleteByHistoryId(id);
         if (details > 0) {
             repository.deleteById(id);
@@ -74,7 +75,7 @@ public class HistoryServiceImpl implements HistoryService {
     }
 
     @Override
-    public HomeRes getPerWeek() throws Exception {
+    public HomeRes getPerWeek() throws HistoryServiceException {
         User user = (User) principalService.getAuthPrincipal();
         HomeRes homeRes = historyDao.getPerWeek(user.getId());
         MonthRes monthRes = new MonthRes();

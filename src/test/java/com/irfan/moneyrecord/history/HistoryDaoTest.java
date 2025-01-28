@@ -1,89 +1,94 @@
 package com.irfan.moneyrecord.history;
 
 import com.irfan.moneyrecord.history.dao.HistoryDao;
-import com.irfan.moneyrecord.history.model.History;
-import com.irfan.moneyrecord.user.model.Role;
-import com.irfan.moneyrecord.user.model.User;
+import com.irfan.moneyrecord.history.dto.HomeRes;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.Query;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.context.annotation.Bean;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.time.LocalDate;
+import java.util.Arrays;
+import java.util.List;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
-@DataJpaTest
 public class HistoryDaoTest {
 
-    @Autowired
-    private TestEntityManager em;
+    @Mock
+    private EntityManager em;
 
-    @Autowired
+    @Mock
+    private Query query;
+
+    @InjectMocks
     private HistoryDao historyDao;
-
-    private User user;
-
-    @TestConfiguration
-    static class HistoryDaoTestContextConfiguration {
-        @Bean
-        public HistoryDao historyDao() {
-            return new HistoryDao();
-        }
-    }
 
     @BeforeEach
     public void setUp() {
-        user = User.builder()
-                .fullName("john")
-                .email("john@mail.com")
-                .password("123456")
-                .role(Role.USER)
-                .build();
-        em.persist(user);
-
-        History history1 = History.builder()
-                .type("Pengeluaran")
-                .date(LocalDate.now())
-                .total(10000D)
-                .user(user)
-                .build();
-        History history2 = History.builder()
-                .type("Pemasukkan")
-                .date(LocalDate.now().minusDays(1))
-                .total(110000D)
-                .user(user)
-                .build();
-        em.persist(history1);
-        em.persist(history2);
-        em.flush();
+        when(em.createNativeQuery(anyString())).thenReturn(query);
     }
 
     @Test
-    public void getPerWeek() {
-        var histories = historyDao.getPerWeek(user.getId());
-        assertThat(10000D)
-                .isEqualTo(histories.getToday().doubleValue());
+    public void testGetPerWeek() {
+        String userId = "testUserId";
+        LocalDate now = LocalDate.now();
+        LocalDate yesterday = now.minusDays(1);
+        LocalDate dayBeforeYesterday = now.minusDays(2);
+
+        List<Object[]> resultList = Arrays.asList(
+                new Object[]{now.toString(), "Today", 100.0},
+                new Object[]{yesterday.toString(), "Yesterday", 50.0},
+                new Object[]{dayBeforeYesterday.toString(), "DayBeforeYesterday", 25.0}
+        );
+
+        when(query.setParameter(eq("userId"), eq(userId))).thenReturn(query);
+        when(query.setParameter(eq("dateEnd"), eq(now.minusDays(6)))).thenReturn(query);
+        when(query.setMaxResults(7)).thenReturn(query);
+        when(query.getResultList()).thenReturn(resultList);
+
+        HomeRes homeRes = historyDao.getPerWeek(userId);
+
+        assertEquals(100.0, homeRes.getToday());
+        assertEquals(50.0, homeRes.getYesterday());
+        assertEquals(3, homeRes.getWeek().size());
     }
 
     @Test
-    public void getIncomePerMonth() {
-        var histories = historyDao.getIncomePerMonth(user.getId());
-        assertThat(110000D)
-                .isEqualTo(histories.doubleValue());
+    public void testGetIncomePerMonth() {
+        String userId = "testUserId";
+        int currentMonth = LocalDate.now().getMonthValue();
+        Double expectedIncome = 1500.0;
+
+        when(query.setParameter(eq("userId"), eq(userId))).thenReturn(query);
+        when(query.setParameter(eq("month"), eq(currentMonth))).thenReturn(query);
+        when(query.getSingleResult()).thenReturn(expectedIncome);
+
+        Double income = historyDao.getIncomePerMonth(userId);
+
+        assertEquals(expectedIncome, income);
     }
 
     @Test
-    public void getOutcomePerMonth() {
-        var histories = historyDao.getOutcomePerMonth(user.getId());
-        assertThat(10000D)
-                .isEqualTo(histories.doubleValue());
-    }
+    public void testGetOutcomePerMonth() {
+        String userId = "testUserId";
+        int currentMonth = LocalDate.now().getMonthValue();
+        Double expectedOutcome = 1000.0;
 
+        when(query.setParameter(eq("userId"), eq(userId))).thenReturn(query);
+        when(query.setParameter(eq("month"), eq(currentMonth))).thenReturn(query);
+        when(query.getSingleResult()).thenReturn(expectedOutcome);
+
+        Double outcome = historyDao.getOutcomePerMonth(userId);
+
+        assertEquals(expectedOutcome, outcome);
+    }
 }
